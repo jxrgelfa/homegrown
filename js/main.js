@@ -15,7 +15,7 @@
 
   ============================================================
 */
-
+const WHATSAPP_NUMERO = '5493585703953'; // 👈 CAMBIÁ por tu número
 
 /* ============================================================
    1. SELECCIÓN DE ELEMENTOS DEL DOM
@@ -331,3 +331,39 @@ botonesAgregar.forEach(function(btn) {
    que podría haber en localStorage de una visita anterior.
    ============================================================ */
 actualizarUI();
+
+function finalizarCompra() {
+  if (carrito.length === 0) return;
+
+  const lineasProductos = carrito.map(function(item) {
+    const subtotal = (item.precio * item.cantidad).toLocaleString('es-AR');
+    return `• ${item.nombre} x${item.cantidad} — $${subtotal}`;
+  });
+
+  const totalPrecio = carrito.reduce(function(acum, item) {
+    return acum + (item.precio * item.cantidad);
+  }, 0);
+
+  const mensaje =
+    `¡Hola Homegrown! Quiero hacer el siguiente pedido:\n\n` +
+    lineasProductos.join('\n') +
+    `\n\n*Total: $${totalPrecio.toLocaleString('es-AR')}*\n\n` +
+    `¿Cómo coordino el pago y el envío?`;
+
+  const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensaje)}`;
+  window.open(url, '_blank');
+}
+
+function vaciarCarrito() {
+  carrito = [];
+  guardarCarrito();
+  actualizarUI();
+}
+
+carritoPanel.addEventListener('click', function(evento) {
+  const btnFinalizar = evento.target.closest('.btn-finalizar');
+  const btnVaciar    = evento.target.closest('.btn-vaciar');
+
+  if (btnFinalizar) finalizarCompra();
+  if (btnVaciar)    vaciarCarrito();
+});
